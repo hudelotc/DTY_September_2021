@@ -55,7 +55,36 @@ class AIPlayer(Player):
                 beta = min(beta, value)
             return value
 
+
+    def heuristicList(self, array):
+        pass
+
+
+    def heuristicFull(self, array):
+        res = 0
+        for i in range(len(array)-3):
+            res += self.heuristicList(array[i:i+4])
+        return res
+
     def heuristic(self, board):
-        return 1
+        evaluation = 0
+        # col evaluation
+        for col in board:
+            evaluation += self.heuristicFull(col)
+        # row evaluation
+        for j in range(board.num_rows):
+            row = board.getRow(j)
+            evaluation += self.heuristicFull(row)
+        # diag up evaluation
+        for i in range(-2, 4):
+            diag_up = board.getDiagonal(True, i)
+            evaluation += self.heuristicFull(diag_up)
+        # diag down evaluation
+        for i in range(3, 9):
+            diag_down = board.getDiagonal(False, i)
+            evaluation += self.heuristicFull(diag_down)
+        
+        return evaluation
     
+
     

@@ -9,8 +9,7 @@ class AIPlayer(Player):
     """This player should implement a heuristic along with a min-max and alpha
     beta search to """
 	
-    def __init__(self, first=True, depth=3):
-        self.first = first
+    def __init__(self, depth=3):
         self.name = "$ nepThune $"
         self.depth = depth
 
@@ -18,14 +17,13 @@ class AIPlayer(Player):
     def getColumn(self, board):
         extr_col = None
         extr_val = -infty
-        cond = '>' if self.first else '<'
     
         for col in board.getPossibleColumns():
             child = copy.deepcopy(board)
             child.play(self.color, col)
 
             val = self.alphabeta(child, self.depth)
-            if eval(f"val {cond} extr_val", dict(val=val, extr_val=extr_val)):
+            if val > extr_val:
                 extr_col = col
                 extr_val = val
                 
@@ -33,7 +31,7 @@ class AIPlayer(Player):
                     
         
     
-    def alphabeta(self, board, depth=3, alpha=infty, beta=infty, maximizingPlayer=True):
+    def alphabeta(self, board, depth=3, alpha=-infty, beta=infty, maximizingPlayer=True):
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
@@ -68,7 +66,6 @@ class AIPlayer(Player):
         return res
 
     def heuristic(self, board):
-        # print("enter heuristic")
         evaluation = 0
         # col evaluation
         for i in range(board.num_cols):
@@ -99,10 +96,10 @@ class AIPlayer(Player):
         for slot in List:
             scores[slot] = scores[slot] + 1
 
-        if scores[-1] == 0 : # foe has no slot then points for me
-            return scoreGrid[scores[1]]
-        if scores[1] == 0 :  # I have no slot, then points for foe
-            return -scoreGrid[scores[-1]]
+        if scores[-self.color] == 0 : # foe has no slot then points for me
+            return self.color * scoreGrid[scores[1]]
+        if scores[self.color] == 0 :  # I have no slot, then points for foe
+            return -self.color * scoreGrid[scores[-1]]
         return 0
 
 if __name__ == '__main__':

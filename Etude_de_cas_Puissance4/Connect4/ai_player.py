@@ -11,12 +11,26 @@ class AIPlayer(Player):
 
     
     def getColumn(self, board):
-         # TODO(student): implement this!
-        return 0
+        
+        max_col = 0
+        max_val = 0
+        
+        for col in board.getPossibleColumns():
+            child = copy.deepcopy(board)
+            child.play(Player, col)
+            
+            
+            val = self.alphabeta(child, 3)
+            if val > max_val:
+                max_col = col
+                max_val = val
+        
+        return max_col
     
-    def alphabeta(self, board, depth, alpha, beta, maximizingPlayer=True):
+    def alphabeta(self, board, depth, alpha=0, beta=1000, maximizingPlayer=True):
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
+        
         if maximizingPlayer :
             value = -1
             for col in board.getPossibleColumns():
@@ -42,4 +56,6 @@ class AIPlayer(Player):
             return value
 
     def heuristic(self, board):
-        return 0
+        return 1
+    
+    

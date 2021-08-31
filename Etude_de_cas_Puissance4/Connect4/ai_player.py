@@ -19,7 +19,7 @@ class AIPlayer(Player):
         
         for col in board.getPossibleColumns():
             child = copy.deepcopy(board)
-            child.play(Player, col)
+            child.play(self.color, col)
             
             
             val = self.alphabeta(child, 3)
@@ -29,7 +29,7 @@ class AIPlayer(Player):
         
         return max_col
     
-    def alphabeta(self, board, depth, alpha=float('-inf'), beta=float('inf'), maximizingPlayer=True):
+    def alphabeta(self, board, depth=3, alpha=float('-inf'), beta=float('inf'), maximizingPlayer=True):
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
@@ -37,7 +37,7 @@ class AIPlayer(Player):
             value = -float('inf')
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
-                child.play(Player, col)
+                child.play(self.color, col)
                 
                 value = max(value, self.alphabeta(child, depth-1, alpha, beta, False))
                 
@@ -49,7 +49,7 @@ class AIPlayer(Player):
             value = float('inf')
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
-                child.play(Player, col)
+                child.play(-self.color, col)
                 
                 value = min(value, self.alphabeta(child, depth-1, alpha, beta, True))
                 if value <= alpha :
@@ -64,9 +64,11 @@ class AIPlayer(Player):
         return res
 
     def heuristic(self, board):
+        # print("enter heuristic")
         evaluation = 0
         # col evaluation
-        for col in board:
+        for i in range(board.num_cols):
+            col = board.getCol(i)
             evaluation += self._heuristic_utils(col)
         # row evaluation
         for j in range(board.num_rows):

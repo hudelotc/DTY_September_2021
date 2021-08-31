@@ -13,6 +13,7 @@ if __name__ == '__main__':
     player1 = AIPlayer()
     player1.name = args.p1
     player2 = HumanPlayer()
+    # player2 = AIPlayer()
     player2.name = args.p2
 
     game = UIGame(player1, player2)

@@ -1,9 +1,9 @@
 from player import Player
 import copy
-from player import RandomPlayer
-from game import Game
+
 
 infty = float('inf')
+
 
 class AIPlayer(Player):
     """This player should implement a heuristic along with a min-max and alpha
@@ -15,57 +15,94 @@ class AIPlayer(Player):
 
     
     def getColumn(self, board):
-        extr_col = None
-        extr_val = -infty
+        """ Finds the column with the highess probability of winning
+
+        Args:
+            board (board.board): current game board
+
+        Returns:
+            int: column index between 0 and 6 (inclusive)
+        """
+        opt_col = None
+        best_score = -infty
     
         for col in board.getPossibleColumns():
             child = copy.deepcopy(board)
             child.play(self.color, col)
 
             val = self.alphabeta(child, self.depth)
-            if val > extr_val:
-                extr_col = col
-                extr_val = val
+            if val > best_score:
+                opt_col = col
+                best_score = val
                 
-        return extr_col
-                    
-        
+        return opt_col
+  
     
     def alphabeta(self, board, depth=3, alpha=-infty, beta=infty, maximizingPlayer=True):
+        """ Computes the alpha beta algorithm
+
+        Args:
+            board (board.board): current game board
+            depth (int, optional): depth limit. 
+                Defaults to 3.
+            alpha (float, optional): minimum score that the maximum player is assured of.
+                Defaults to -infty (worse case scenario for maximum player).
+            beta ([type], optional): maximum score that the minimum player is assured of.
+                Defaults to infty (worse case scenario for minimum player).
+            maximizingPlayer (bool, optional): are we min or max player ?
+                Defaults to True.
+
+        Returns:
+            int: the returned value of alphabeta algorithm
+        
+        Notes:
+            See https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning#Pseudocode for more info
+        """
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
-        if maximizingPlayer :
-            value = -infty
-            for col in board.getPossibleColumns():
-                child = copy.deepcopy(board)
-                child.play(-self.color, col)
-                
-                value = max(value, self.alphabeta(child, depth-1, alpha, beta, False))
-                
-                if value >= beta:
-                    return value # beta cutoff 
-                alpha = max(alpha, value)
-            return value
+        if maximizingPlayer:
+            return self.maxvalue(board, depth, alpha, beta)
         else:
-            value = infty
-            for col in board.getPossibleColumns():
-                child = copy.deepcopy(board)
-                child.play(self.color, col)
-                
-                value = min(value, self.alphabeta(child, depth-1, alpha, beta, True))
-                if value <= alpha :
-                    return value #alpha cutoff 
-                beta = min(beta, value)
-            return value
+            return self.minvalue(board, depth, alpha, beta)
 
-    def _heuristic_utils(self, array):
-        res = 0
-        for i in range(len(array)-3):
-            res += self.heuriList(array[i:i+4])
-        return res
+
+    def maxvalue(self, board, depth, alpha, beta):
+        value = -infty
+        for col in board.getPossibleColumns():
+            child = copy.deepcopy(board)
+            child.play(-self.color, col)
+            
+            value = max(value, self.alphabeta(child, depth-1, alpha, beta, False))
+            
+            if value >= beta:
+                return value # beta cutoff 
+            alpha = max(alpha, value)
+        return value
+
+
+    def minvalue(self, board, depth, alpha, beta):
+        value = infty
+        for col in board.getPossibleColumns():
+            child = copy.deepcopy(board)
+            child.play(self.color, col)
+            
+            value = min(value, self.alphabeta(child, depth-1, alpha, beta, True))
+            if value <= alpha :
+                return value #alpha cutoff 
+            beta = min(beta, value)
+        return value
+   
 
     def heuristic(self, board):
+        """ Compute the heuristic for alphabeta algorithm
+
+        Args:
+            board (board.board): current game board
+
+        Returns:
+            int: score of the current board
+        """
         evaluation = 0
         # col evaluation
         for i in range(board.num_cols):
@@ -76,38 +113,50 @@ class AIPlayer(Player):
             row = board.getRow(j)
             evaluation += self._heuristic_utils(row)
         # diag up evaluation
+        # diag up of length >= 4 have shift in range(-2, 4)
         for i in range(-2, 4):
             diag_up = board.getDiagonal(True, i)
             evaluation += self._heuristic_utils(diag_up)
         # diag down evaluation
+        # diag down of length >= 4 have shift in range(3, 9)
         for i in range(3, 9):
             diag_down = board.getDiagonal(False, i)
             evaluation += self._heuristic_utils(diag_down)
-        #print(evaluation)
         return evaluation
-    
-    def heuriList(self, List) :
+ 
+
+    def _heuristic_utils(self, array):
+        """ Get the heuristic score for a given array (independently of its length is)
+
+        Args:
+            array (list): 
+
+        Returns:
+            int: score of the given array
         """
-        Gives out the score for a list of four elements.
+        res = 0
+        for i in range(len(array)-3):
+            res += self.getScore(array[i:i+4])
+        return res
+
+
+    def getScore(self, List):
+        """ Get the heuristic score for an array of length 4
+
+        Args:
+            array (list): 
+
+        Returns:
+            int: score of the given array
         """
-        scoreGrid = [0, 1, 5, 50, infty]
+        scoreGrid = [0, 1, 7, 200, 10000]
         scores = [0,0,0] # number of [empty, friend, foe] slots
 
         for slot in List:
             scores[slot] = scores[slot] + 1
 
-        if scores[-self.color] == 0 : # foe has no slot then points for me
-            return self.color * scoreGrid[scores[1]]
-        if scores[self.color] == 0 :  # I have no slot, then points for foe
-            return -self.color * scoreGrid[scores[-1]]
+        if scores[-self.color] == 0: # foe has no slot then points for me
+            return scoreGrid[scores[self.color]]
+        if scores[self.color] == 0:  # I have no slot, then points for foe
+            return -scoreGrid[scores[-self.color]]
         return 0
-
-if __name__ == '__main__':
-
-    player1 = RandomPlayer()
-    player1.name = "p1"
-    #player2 = RandomPlayer()
-    player2 = AIPlayer(False, 3)
-    player2.name = "p2"
-    game = Game(player1, player2, verbose=True)
-    game.run()

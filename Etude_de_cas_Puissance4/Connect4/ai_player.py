@@ -8,36 +8,61 @@ class AIPlayer(Player):
     """This player should implement a heuristic along with a min-max and alpha
     beta search to """
 	
-    def __init__(self):
-        self.name = "Mettez ici le nom de votre IA"
+    def __init__(self, first=True, depth=3):
+        self.first = first
+        self.name = "$ nepThune $"
+        self.depth = depth
 
     
     def getColumn(self, board):
         #print("get")
-        max_col = 0
-        max_val = 0
         
-        for col in board.getPossibleColumns():
-            child = copy.deepcopy(board)
-            child.play(self.color, col)
-            
-            
-            val = self.alphabeta(child, 3)
-            if val > max_val:
-                max_col = col
-                max_val = val
+        if self.first:
         
-        return max_col
+            max_col = 0
+            max_val = 0
+        
+            for col in board.getPossibleColumns():
+                child = copy.deepcopy(board)
+                child.play(self.color, col)
+                
+                
+                val = self.alphabeta(child, self.depth)
+                if val > max_val:
+                    max_col = col
+                    max_val = val
+                    
+            return max_col
+                    
+        else:
+        
+            min_col = 0
+            min_val = 0
+            
+            for col in board.getPossibleColumns():
+                child = copy.deepcopy(board)
+                child.play(self.color, col)
+                
+                
+                val = self.alphabeta(child, self.depth)
+                if val < min_val:
+                    min_col = col
+                    min_val = val
+                    
+            return min_col
+                    
+        
     
-    def alphabeta(self, board, depth=3, alpha=float('-inf'), beta=float('inf'), maximizingPlayer=True):
+    def alphabeta(self, board, depth=3, alpha=-float('inf'), beta=float('inf'), maximizingPlayer=True):
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
         if maximizingPlayer :
+            #print("max")
             value = -float('inf')
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
-                child.play(self.color, col)
+                child.play(-self.color, col)
                 
                 value = max(value, self.alphabeta(child, depth-1, alpha, beta, False))
                 
@@ -46,10 +71,11 @@ class AIPlayer(Player):
                 alpha = max(alpha, value)
             return value
         else:
+            #print("min")
             value = float('inf')
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
-                child.play(-self.color, col)
+                child.play(self.color, col)
                 
                 value = min(value, self.alphabeta(child, depth-1, alpha, beta, True))
                 if value <= alpha :
@@ -82,7 +108,7 @@ class AIPlayer(Player):
         for i in range(3, 9):
             diag_down = board.getDiagonal(False, i)
             evaluation += self._heuristic_utils(diag_down)
-        
+        #print(evaluation)
         return evaluation
     
     def heuriList(self, List) :
@@ -103,12 +129,10 @@ class AIPlayer(Player):
 
 if __name__ == '__main__':
 
-    player1 = AIPlayer()
+    player1 = RandomPlayer()
     player1.name = "p1"
-    player2 = RandomPlayer()
+    #player2 = RandomPlayer()
+    player2 = AIPlayer(False, 3)
     player2.name = "p2"
     game = Game(player1, player2, verbose=True)
     game.run()
-
-    
-    

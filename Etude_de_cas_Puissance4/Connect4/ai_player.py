@@ -16,54 +16,29 @@ class AIPlayer(Player):
 
     
     def getColumn(self, board):
-<<<<<<< HEAD
-        max_col = None
-        max_val = -infty
-        
-        for col in board.getPossibleColumns():
-            child = copy.deepcopy(board)
-            child.play(self.color, col)
-            
-            val = self.alphabeta(child, depth=3)
-            if val > max_val:
-                max_col = col
-                max_val = val
-=======
-        #print("get")
-        
-        extr_col = 0
-        extr_val = 0
+        extr_col = None
+        extr_val = -infty
+        cond = '>' if self.first else '<'
     
         for col in board.getPossibleColumns():
             child = copy.deepcopy(board)
             child.play(self.color, col)
-            
-            
+
             val = self.alphabeta(child, self.depth)
-            if (val > extr_val and self.first) or (val <extr_val and not(self.first)) :
+            if eval(f"val {cond} extr_val", dict(val=val, extr_val=extr_val)):
                 extr_col = col
                 extr_val = val
                 
         return extr_col
                     
->>>>>>> af68f244c6f25b3dc9f88dea75b67a2be25d9e21
         
     
-<<<<<<< HEAD
     def alphabeta(self, board, depth=3, alpha=infty, beta=infty, maximizingPlayer=True):
-=======
-    def alphabeta(self, board, depth=3, alpha=-float('inf'), beta=float('inf'), maximizingPlayer=True):
->>>>>>> af68f244c6f25b3dc9f88dea75b67a2be25d9e21
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
         if maximizingPlayer :
-<<<<<<< HEAD
             value = -infty
-=======
-            #print("max")
-            value = -float('inf')
->>>>>>> af68f244c6f25b3dc9f88dea75b67a2be25d9e21
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
                 child.play(-self.color, col)
@@ -75,12 +50,7 @@ class AIPlayer(Player):
                 alpha = max(alpha, value)
             return value
         else:
-<<<<<<< HEAD
             value = infty
-=======
-            #print("min")
-            value = float('inf')
->>>>>>> af68f244c6f25b3dc9f88dea75b67a2be25d9e21
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
                 child.play(self.color, col)

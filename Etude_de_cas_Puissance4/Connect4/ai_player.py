@@ -31,39 +31,20 @@ class AIPlayer(Player):
 =======
         #print("get")
         
-        if self.first:
-        
-            max_col = 0
-            max_val = 0
-        
-            for col in board.getPossibleColumns():
-                child = copy.deepcopy(board)
-                child.play(self.color, col)
-                
-                
-                val = self.alphabeta(child, self.depth)
-                if val > max_val:
-                    max_col = col
-                    max_val = val
-                    
-            return max_col
-                    
-        else:
-        
-            min_col = 0
-            min_val = 0
+        extr_col = 0
+        extr_val = 0
+    
+        for col in board.getPossibleColumns():
+            child = copy.deepcopy(board)
+            child.play(self.color, col)
             
-            for col in board.getPossibleColumns():
-                child = copy.deepcopy(board)
-                child.play(self.color, col)
+            
+            val = self.alphabeta(child, self.depth)
+            if (val > extr_val and self.first) or (val <extr_val and not(self.first)) :
+                extr_col = col
+                extr_val = val
                 
-                
-                val = self.alphabeta(child, self.depth)
-                if val < min_val:
-                    min_col = col
-                    min_val = val
-                    
-            return min_col
+        return extr_col
                     
 >>>>>>> af68f244c6f25b3dc9f88dea75b67a2be25d9e21
         

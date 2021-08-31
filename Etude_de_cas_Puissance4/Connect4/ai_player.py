@@ -64,7 +64,7 @@ class AIPlayer(Player):
         """
         Gives out the score for a list of four elements.
         """
-        scoreGrid = [0, 1, 5, 50, 1000]
+        scoreGrid = [0, 1, 5, 50, float('inf')]
         scores = [0,0,0] # number of [empty, friend, foe] slots
 
         for slot in List:

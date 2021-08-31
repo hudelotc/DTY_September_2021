@@ -60,6 +60,21 @@ class AIPlayer(Player):
     def heuristic(self, board):
         return 1
     
+    def heuriList(self, List) :
+        """
+        Gives out the score for a list of four elements.
+        """
+        scoreGrid = [0, 1, 5, 50, 1000]
+        scores = [0,0,0] # number of [empty, friend, foe] slots
+
+        for slot in List:
+            scores[slot] = scores[slot] +1
+
+        if scores[-1] == 0 : # foe has no slot then points for me
+            return scoreGrid[scores[1]]
+        if scores[1] == 0 :  # I have no slot, then points for foe
+            return -scoreGrid[scores[-1]]
+        return 0
 
 if __name__ == '__main__':
 

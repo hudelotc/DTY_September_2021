@@ -1,6 +1,5 @@
 from player import Player
 import copy
-import numpy as np
 from player import RandomPlayer
 from game import Game
 
@@ -30,12 +29,12 @@ class AIPlayer(Player):
         
         return max_col
     
-    def alphabeta(self, board, depth, alpha=-np.inf, beta=np.inf, maximizingPlayer=True):
+    def alphabeta(self, board, depth, alpha=float('-inf'), beta=float('inf'), maximizingPlayer=True):
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
         if maximizingPlayer :
-            value = -np.inf
+            value = -float('inf')
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
                 child.play(Player, col)
@@ -47,7 +46,7 @@ class AIPlayer(Player):
                 alpha = max(alpha, value)
             return value
         else:
-            value = np.inf
+            value = float('inf')
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
                 child.play(Player, col)

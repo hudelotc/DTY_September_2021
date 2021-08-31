@@ -3,6 +3,7 @@ import copy
 from player import RandomPlayer
 from game import Game
 
+infty = float('inf')
 
 class AIPlayer(Player):
     """This player should implement a heuristic along with a min-max and alpha
@@ -13,43 +14,41 @@ class AIPlayer(Player):
 
     
     def getColumn(self, board):
-        #print("get")
-        max_col = 0
-        max_val = 0
+        max_col = None
+        max_val = -infty
         
         for col in board.getPossibleColumns():
             child = copy.deepcopy(board)
             child.play(self.color, col)
             
-            
-            val = self.alphabeta(child, 3)
+            val = self.alphabeta(child, depth=3)
             if val > max_val:
                 max_col = col
                 max_val = val
         
         return max_col
     
-    def alphabeta(self, board, depth=3, alpha=float('-inf'), beta=float('inf'), maximizingPlayer=True):
+    def alphabeta(self, board, depth=3, alpha=infty, beta=infty, maximizingPlayer=True):
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
         if maximizingPlayer :
-            value = -float('inf')
+            value = -infty
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
-                child.play(self.color, col)
+                child.play(-self.color, col)
                 
                 value = max(value, self.alphabeta(child, depth-1, alpha, beta, False))
                 
-                if value >= beta :
+                if value >= beta:
                     return value # beta cutoff 
                 alpha = max(alpha, value)
             return value
         else:
-            value = float('inf')
+            value = infty
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
-                child.play(-self.color, col)
+                child.play(self.color, col)
                 
                 value = min(value, self.alphabeta(child, depth-1, alpha, beta, True))
                 if value <= alpha :
@@ -89,11 +88,11 @@ class AIPlayer(Player):
         """
         Gives out the score for a list of four elements.
         """
-        scoreGrid = [0, 1, 5, 50, float('inf')]
+        scoreGrid = [0, 1, 5, 50, infty]
         scores = [0,0,0] # number of [empty, friend, foe] slots
 
         for slot in List:
-            scores[slot] = scores[slot] +1
+            scores[slot] = scores[slot] + 1
 
         if scores[-1] == 0 : # foe has no slot then points for me
             return scoreGrid[scores[1]]

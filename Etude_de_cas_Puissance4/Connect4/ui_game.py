@@ -93,12 +93,14 @@ class UIGame(Game):
             return self.mayMakeCurrentPlayerLoose()
 
         self.play(col)
+        print(player.color, self.board.getPossibleColumns(), col)
 
     def click(self, event):
         """Reponse to a click event, for human player only."""
         player = self.players[self.currPlayer]
         if player.HUMAN:
             col = int(event.x / self.cellW)
+            print(player.color, self.board.getPossibleColumns(), col)
             self.play(col)
 
     def play(self, col):

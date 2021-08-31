@@ -2,6 +2,7 @@ import copy
 import random
 import os
 import sys
+import time
 
 import utils
 from board import Board
@@ -71,7 +72,9 @@ class Game(object):
     def run(self, randomStart=False):
         """This method runs the game, alterating between the players."""
         self.reset(randomStart)
+        
         while not self.isOver():
+            t = time.time()
             player = self.players[self.currPlayer]
             try:
                 if player.HUMAN:
@@ -89,5 +92,6 @@ class Game(object):
             self.mayShowDebug()
             self.winner = self.getWinner(pos)
             self.currPlayer = (self.currPlayer + 1) % 2
+            print(time.time()-t)
 
         self.mayShowDebug()

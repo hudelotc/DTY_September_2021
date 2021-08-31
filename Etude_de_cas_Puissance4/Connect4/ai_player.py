@@ -1,5 +1,8 @@
 from player import Player
 import copy
+import numpy as np
+from player import RandomPlayer
+from game import Game
 
 
 class AIPlayer(Player):
@@ -11,7 +14,7 @@ class AIPlayer(Player):
 
     
     def getColumn(self, board):
-        
+        #print("get")
         max_col = 0
         max_val = 0
         
@@ -27,12 +30,12 @@ class AIPlayer(Player):
         
         return max_col
     
-    def alphabeta(self, board, depth, alpha=0, beta=1000, maximizingPlayer=True):
+    def alphabeta(self, board, depth, alpha=-np.inf, beta=np.inf, maximizingPlayer=True):
         if depth == 0 or board.isFull() :
             return self.heuristic(board)
         
         if maximizingPlayer :
-            value = -1
+            value = -np.inf
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
                 child.play(Player, col)
@@ -40,18 +43,18 @@ class AIPlayer(Player):
                 value = max(value, self.alphabeta(child, depth-1, alpha, beta, False))
                 
                 if value >= beta :
-                    break # beta cutoff 
+                    return value # beta cutoff 
                 alpha = max(alpha, value)
             return value
         else:
-            value = 1000
+            value = np.inf
             for col in board.getPossibleColumns():
                 child = copy.deepcopy(board)
                 child.play(Player, col)
                 
                 value = min(value, self.alphabeta(child, depth-1, alpha, beta, True))
                 if value <= alpha :
-                    break #α cutoff 
+                    return value #alpha cutoff 
                 beta = min(beta, value)
             return value
 
@@ -73,3 +76,15 @@ class AIPlayer(Player):
         if scores[1] == 0 :  # I have no slot, then points for foe
             return -scoreGrid[scores[-1]]
         return 0
+
+if __name__ == '__main__':
+
+    player1 = AIPlayer()
+    player1.name = "p1"
+    player2 = RandomPlayer()
+    player2.name = "p2"
+    game = Game(player1, player2, verbose=True)
+    game.run()
+
+    
+    
